@@ -1,4 +1,61 @@
-export const createEditFormTemplate = () => (`<form class="event event--edit" action="#" method="post">
+import { getRandomInteger } from '../utils.js';
+
+export const createEditFormTemplate = (tasks) => {
+  const {type, destination, dateFrom, dateTo, basicPrice, offers} = tasks;
+
+  const createOffersRender = () => {
+    const offersBlock = [];
+
+    for (let i = 0; i < offers.offer.length; i++) {
+      let bend = '';
+      switch (offers.offer[i].title) {
+        case 'Upgrade to a business class':
+          bend = 'business-class';
+          break;
+        case 'Choose the radio station':
+          bend = 'radio-station';
+          break;
+        case 'Order Uber':
+          bend = 'order-uber';
+          break;
+        case 'Add luggage':
+          bend = 'luggage';
+          break;
+        case 'Rent a car':
+          bend = 'rent-car';
+          break;
+        case 'Add breakfast':
+          bend = 'breakfast';
+          break;
+        case 'Switch to comfort':
+          bend = 'comfort';
+          break;
+        case 'Choose seats':
+          bend = 'seats';
+          break;
+        case 'Travel by train':
+          bend = 'train';
+          break;
+        case 'Add meal':
+          bend = 'meal';
+          break;
+      }
+
+      const isChecked = () => Boolean(getRandomInteger(0, 1)) === true ? 'checked' : '';
+
+      offersBlock.push(`<div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${bend}-1" type="checkbox" name="event-offer-${bend}" ${isChecked()}>
+      <label class="event__offer-label" for="event-offer-${bend}-1">
+        <span class="event__offer-title">${offers.offer[i].title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${offers.offer[i].price}</span>
+      </label>
+    </div>`);
+    }
+    return offersBlock.join('');
+  };
+
+  return `<form class="event event--edit" action="#" method="post">
 <header class="event__header">
   <div class="event__type-wrapper">
     <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -66,9 +123,9 @@ export const createEditFormTemplate = () => (`<form class="event event--edit" ac
 
   <div class="event__field-group  event__field-group--destination">
     <label class="event__label  event__type-output" for="event-destination-1">
-      Flight
+      ${type}
     </label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
     <datalist id="destination-list-1">
       <option value="Amsterdam"></option>
       <option value="Geneva"></option>
@@ -78,10 +135,10 @@ export const createEditFormTemplate = () => (`<form class="event event--edit" ac
 
   <div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-1">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom.format('DD/MM/YY HH:MM')}">
     &mdash;
     <label class="visually-hidden" for="event-end-time-1">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo.format('DD/MM/YY HH:MM')}">
   </div>
 
   <div class="event__field-group  event__field-group--price">
@@ -89,7 +146,7 @@ export const createEditFormTemplate = () => (`<form class="event event--edit" ac
       <span class="visually-hidden">Price</span>
       &euro;
     </label>
-    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="160">
+    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basicPrice}">
   </div>
 
   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -103,56 +160,14 @@ export const createEditFormTemplate = () => (`<form class="event event--edit" ac
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
     <div class="event__available-offers">
-      <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
-        <label class="event__offer-label" for="event-offer-luggage-1">
-          <span class="event__offer-title">Add luggage</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">50</span>
-        </label>
-      </div>
-
-      <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked>
-        <label class="event__offer-label" for="event-offer-comfort-1">
-          <span class="event__offer-title">Switch to comfort</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">80</span>
-        </label>
-      </div>
-
-      <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-        <label class="event__offer-label" for="event-offer-meal-1">
-          <span class="event__offer-title">Add meal</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">15</span>
-        </label>
-      </div>
-
-      <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
-        <label class="event__offer-label" for="event-offer-seats-1">
-          <span class="event__offer-title">Choose seats</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">5</span>
-        </label>
-      </div>
-
-      <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
-        <label class="event__offer-label" for="event-offer-train-1">
-          <span class="event__offer-title">Travel by train</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">40</span>
-        </label>
-      </div>
+      ${createOffersRender()}
     </div>
   </section>
 
   <section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">Chamonix-Mont-Blanc (usually shortened to Chamonix) is a resort area near the junction of France, Switzerland and Italy. At the base of Mont Blanc, the highest summit in the Alps, it's renowned for its skiing.</p>
+    <p class="event__destination-description">${destination.description}</p>
   </section>
 </section>
-</form>`);
+</form>`;
+};
