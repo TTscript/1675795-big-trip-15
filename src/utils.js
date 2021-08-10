@@ -1,4 +1,5 @@
-// FUNCTION GET RANDOM INTEGER NUMBER
+const tripEvents = document.querySelector('.trip-events');
+
 const getRandomInteger = (min = 0, max = 1) => {
   if (min > max) {
     [min, max] = [max, min];
@@ -10,7 +11,6 @@ const getRandomInteger = (min = 0, max = 1) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-//FUNCTION GET RANDOM ROUND INTEGER
 const getRandomIntegerMultiplesFive = (min = 0, max = 1) => {
   if (min > max) {
     [min, max] = [max, min];
@@ -22,4 +22,10 @@ const getRandomIntegerMultiplesFive = (min = 0, max = 1) => {
   return (Math.round(Math.random() * (max - min + 1)) + min) * 5;
 };
 
-export {getRandomInteger, getRandomIntegerMultiplesFive};
+const createElement = () => {
+  const createdElement = document.createElement('ul');
+  createdElement.classList.add('trip-events__list');
+  tripEvents.appendChild(createdElement);
+};
+
+export {getRandomInteger, getRandomIntegerMultiplesFive, createElement};
