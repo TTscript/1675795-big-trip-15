@@ -9,12 +9,7 @@ const MAX_RANDOM_PHOTOS = 10000;
 const MAX_PHOTOS_ARRAY_ITEMS = 5;
 const MAX_POINT_ID_NUMBER = 100;
 const MAX_OFFER_PRICE = 200;
-
-const generateBasicPrice = () => getRandomInteger(0, MAX_PRICE);
-
-const generateDate = () => dayjs().add(getRandomInteger(0, MAX_DAYS_GAP), 'day').toDate();
-
-const descriptions = [
+const DESCRIPTION = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra.',
@@ -27,34 +22,58 @@ const descriptions = [
   'Nunc fermentum tortor ac porta dapibus.',
   'In rutrum ac purus sit amet tempus.',
 ];
+const CITIES = [
+  'Las Vegas',
+  'Sedona',
+  'Rome',
+  'Athens',
+  'Berlin',
+  'London',
+  'Paris',
+  'Tokyo',
+  'Singapore',
+  'Barcelona',
+  'Madrid',
+  'Toronto',
+  'San Francisco',
+  'Amsterdam',
+  'Prague',
+  'Sydney',
+];
+const TYPES = [
+  'Check-in',
+  'Sightseeing',
+  'Restaurant',
+  'Taxi',
+  'Bus',
+  'Train',
+  'Ship',
+  'Drive',
+  'Flight',
+];
+const TITLES = [
+  'Upgrade to a business class',
+  'Choose the radio station',
+  'Order Uber',
+  'Add luggage',
+  'Rent a car',
+  'Add breakfast',
+  'Switch to comfort',
+  'Choose seats',
+  'Travel by train',
+  'Add meal',
+];
+
+const generateBasicPrice = () => getRandomInteger(0, MAX_PRICE);
+
+const generateDate = () => dayjs().add(getRandomInteger(0, MAX_DAYS_GAP), 'day').toDate();
 
 const generateDescription = (maxDescription) => {
-  const description = descriptions.filter( (element) => Boolean(getRandomInteger(0, 1)) === true ? element : false);
+  const description = DESCRIPTION.filter( (element) => Boolean(getRandomInteger(0, 1)) === true ? element : false);
   return description.slice(0, maxDescription).join(' ');
 };
 
-const generateCities = () => {
-  const cities = [
-    'Las Vegas',
-    'Sedona',
-    'Rome',
-    'Athens',
-    'Berlin',
-    'London',
-    'Paris',
-    'Tokyo',
-    'Singapore',
-    'Barcelona',
-    'Madrid',
-    'Toronto',
-    'San Francisco',
-    'Amsterdam',
-    'Prague',
-    'Sydney',
-  ];
-
-  return cities[getRandomInteger(0, cities.length - 1)];
-};
+const generateCities = () => CITIES[getRandomInteger(0, CITIES.length - 1)];
 
 const generateRandomPhoto = () => {
   const randomPhoto = () => {
@@ -80,21 +99,8 @@ const generatePointId = () => `point--${getRandomInteger(0, MAX_POINT_ID_NUMBER)
 
 const generateFavorites = () => Boolean(getRandomInteger(0, 1));
 
-const titles = [
-  'Upgrade to a business class',
-  'Choose the radio station',
-  'Order Uber',
-  'Add luggage',
-  'Rent a car',
-  'Add breakfast',
-  'Switch to comfort',
-  'Choose seats',
-  'Travel by train',
-  'Add meal',
-];
-
 const generateRandomOffers = () => {
-  const generateOffersTitles = () => titles[getRandomInteger(0, titles.length - 1)];
+  const generateOffersTitles = () => TITLES[getRandomInteger(0, TITLES.length - 1)];
   const generateOffersBlock = () => {
     const offer = {
       title: generateOffersTitles(),
@@ -102,26 +108,11 @@ const generateRandomOffers = () => {
     };
     return offer;
   };
-  const offers = new Array(getRandomInteger(0, titles.length - 1)).fill().map(generateOffersBlock).slice(0, getRandomInteger(1, 4));
+  const offers = new Array(getRandomInteger(0, TITLES.length - 1)).fill().map(generateOffersBlock).slice(0, getRandomInteger(1, 4));
   return offers;
 };
 
-const generateTypes = () => {
-  const types = [
-    'Check-in',
-    'Sightseeing',
-    'Restaurant',
-    'Taxi',
-    'Bus',
-    'Train',
-    'Ship',
-    'Drive',
-    'Flight',
-  ];
-
-  const randomIndex = getRandomInteger(0, types.length - 1);
-  return types[randomIndex];
-};
+const generateTypes = () =>  TYPES[getRandomInteger(0, TYPES.length - 1)];
 
 const generateOffer = () => {
   const offer = {

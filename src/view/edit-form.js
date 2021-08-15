@@ -1,6 +1,6 @@
-import { getRandomInteger } from '../utils.js';
+import { getRandomInteger, createElement } from '../utils.js';
 
-export const createEditFormTemplate = (tasks) => {
+const createEditFormTemplate = (tasks) => {
   const {type, destination, dateFrom, dateTo, basicPrice, offers} = tasks;
 
   const createOffersRender = () => {
@@ -171,3 +171,25 @@ export const createEditFormTemplate = (tasks) => {
 </section>
 </form>`;
 };
+
+export default class EditForm {
+  constructor(tasks) {
+    this._tasks = tasks;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditFormTemplate(this._tasks);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

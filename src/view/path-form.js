@@ -1,10 +1,12 @@
-export const createPathFormTemplate = (tasks) => {
+import { createElement } from '../utils';
+
+const createPathFormTemplate = (tasks) => {
 
   const {type, destination, dateFrom, dateTo, basicPrice} = tasks;
   const createRoutePoint = () =>
     `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="2019-03-18">${dateFrom.format('MMM DD')}</time>
+      <time class="event__date" datetime="${dateFrom.format('YYYY-MM-DD')}">${dateFrom.format('MMM DD')}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
       </div>
@@ -41,4 +43,26 @@ export const createPathFormTemplate = (tasks) => {
     </li>`;
   return createRoutePoint();
 };
+
+export default class PathForm {
+  constructor(tasks) {
+    this._tasks = tasks;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPathFormTemplate(this._tasks);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
 
