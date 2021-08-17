@@ -4,35 +4,31 @@ import TripPriceView from './view/trip-price.js';
 import FilterView from './view/filters.js';
 import SortView from './view/sort.js';
 import EditFormView from './view/edit-form.js';
-import PathListView from './view/path-list.js';
 import PathFormView from './view/path-form.js';
-import { generateTask } from './generate-task.js';
+import EmptyListView from './view/empty-pathes-list.js';
 import './generate-task.js';
 import { render, RenderPostition, sortPathElements } from './utils.js';
+import { constants } from './constants';
 
-const TASK_COUNT = 20;
-const tripMenu = document.querySelector('.trip-main');
-const siteMenu = tripMenu.querySelector('.trip-controls__navigation');
-const siteFilters = document.querySelector('.trip-controls__filters');
-const tripEvents = document.querySelector('.trip-events');
-const tasks = new Array(TASK_COUNT).fill().map(generateTask);
-const pathListComponent = new PathListView();
-
-render(siteMenu, new SiteMenuView().getElement(), RenderPostition.BEFOREEND);
+render(constants.siteMenu, new SiteMenuView().getElement(), RenderPostition.BEFOREEND);
+render(constants.siteFilters, new FilterView().getElement(), RenderPostition.BEFOREEND);
 
 let totalPrice = 0;
 const totalPathes = [];
 
-for (let i = 0; i < tasks.length; i++) {
-  totalPrice += tasks[i].basicPrice;
-  totalPathes.push(tasks[i].destination.name);
-}
+constants.tasks.forEach((task) => {
+  totalPrice += task.basicPrice;
+  totalPathes.push(task.destination.name);
+});
 
-render(tripMenu, new TripPriceView(totalPrice).getElement(), RenderPostition.AFTERBEGIN);
-render(tripMenu, new TripPathView(totalPathes).getElement(), RenderPostition.AFTERBEGIN);
-render(siteFilters, new FilterView().getElement(), RenderPostition.BEFOREEND);
-render(tripEvents, pathListComponent.getElement(), RenderPostition.AFTERBEGIN);
-render(pathListComponent.getElement(), new SortView().getElement(), RenderPostition.BEFOREBEGIN);
+if (constants.tasks.length === 0) {
+  render(constants.tripEvents, new EmptyListView().getElement(), RenderPostition.AFTERBEGIN);
+} else {
+  render(constants.tripMenu, new TripPriceView(totalPrice).getElement(), RenderPostition.AFTERBEGIN);
+  render(constants.tripMenu, new TripPathView(totalPathes).getElement(), RenderPostition.AFTERBEGIN);
+  render(constants.tripEvents, constants.pathListComponent.getElement(), RenderPostition.AFTERBEGIN);
+  render(constants.pathListComponent.getElement(), new SortView().getElement(), RenderPostition.BEFOREBEGIN);
+}
 
 const renderPath = (pathList, task) => {
   const pathFormComponent = new PathFormView(task);
@@ -46,12 +42,20 @@ const renderPath = (pathList, task) => {
     pathList.replaceChild(pathFormComponent.getElement(), editFormComponent.getElement());
   };
 
+  const onClickPopupForm = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      replaceEditFormToPathForm();
+      document.removeEventListener('click', onClickPopupForm);
+    }
+  };
+
   pathFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
     replacePathFormToEditForm();
   });
 
   editFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
     replaceEditFormToPathForm();
+    window.addEventListener('click', onClickPopupForm);
   });
 
   editFormComponent.getElement().addEventListener('submit', (event) => {
@@ -59,14 +63,24 @@ const renderPath = (pathList, task) => {
     replaceEditFormToPathForm();
   });
 
+  const onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      replaceEditFormToPathForm();
+      document.removeEventListener('keydown', onEscKeyDown);
+    }
+  };
+  window.addEventListener('keydown', () => {
+    replaceEditFormToPathForm();
+    window.addEventListener('keydown', onEscKeyDown);
+  });
+
   render(pathList, pathFormComponent.getElement(), RenderPostition.BEFOREEND);
 };
 
-
-for (let i = 0; i < tasks.length; i++) {
-  renderPath(pathListComponent.getElement(), tasks[i]);
-}
+constants.tasks.forEach((task) => {
+  renderPath(constants.pathListComponent.getElement(), task);
+});
 
 sortPathElements();
-
 
