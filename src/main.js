@@ -7,11 +7,13 @@ import EditFormView from './view/edit-form.js';
 import PathFormView from './view/path-form.js';
 import EmptyListView from './view/empty-pathes-list.js';
 import './generate-task.js';
-import { render, RenderPostition, sortPathElements } from './utils.js';
 import { constants } from './constants';
+import { sortPathElements } from './utils/sort-path-elements.js';
+import { RenderPostition, render, replace } from './utils/render.js';
+import { isEscEvent } from './utils/common.js';
 
-render(constants.siteMenu, new SiteMenuView().getElement(), RenderPostition.BEFOREEND);
-render(constants.siteFilters, new FilterView().getElement(), RenderPostition.BEFOREEND);
+render(constants.siteMenu, new SiteMenuView(), RenderPostition.BEFOREEND);
+render(constants.siteFilters, new FilterView(), RenderPostition.BEFOREEND);
 
 let totalPrice = 0;
 const totalPathes = [];
@@ -22,12 +24,12 @@ constants.tasks.forEach((task) => {
 });
 
 if (constants.tasks.length === 0) {
-  render(constants.tripEvents, new EmptyListView().getElement(), RenderPostition.AFTERBEGIN);
+  render(constants.tripEvents, new EmptyListView(), RenderPostition.AFTERBEGIN);
 } else {
-  render(constants.tripMenu, new TripPriceView(totalPrice).getElement(), RenderPostition.AFTERBEGIN);
-  render(constants.tripMenu, new TripPathView(totalPathes).getElement(), RenderPostition.AFTERBEGIN);
-  render(constants.tripEvents, constants.pathListComponent.getElement(), RenderPostition.AFTERBEGIN);
-  render(constants.pathListComponent.getElement(), new SortView().getElement(), RenderPostition.BEFOREBEGIN);
+  render(constants.tripMenu, new TripPriceView(totalPrice), RenderPostition.AFTERBEGIN);
+  render(constants.tripMenu, new TripPathView(totalPathes), RenderPostition.AFTERBEGIN);
+  render(constants.tripEvents, constants.pathListComponent, RenderPostition.AFTERBEGIN);
+  render(constants.pathListComponent, new SortView(), RenderPostition.BEFOREBEGIN);
 }
 
 const renderPath = (pathList, task) => {
@@ -35,44 +37,39 @@ const renderPath = (pathList, task) => {
   const editFormComponent = new EditFormView(task);
 
   const replacePathFormToEditForm = () => {
-    pathList.replaceChild(editFormComponent.getElement(), pathFormComponent.getElement());
+    replace(editFormComponent, pathFormComponent);
   };
 
   const replaceEditFormToPathForm = () => {
-    pathList.replaceChild(pathFormComponent.getElement(), editFormComponent.getElement());
+    replace(pathFormComponent, editFormComponent);
   };
 
-  const onClickPopupForm = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      replaceEditFormToPathForm();
-      document.removeEventListener('click', onClickPopupForm);
-    }
+  const onClickPopupForm = () => {
+    replaceEditFormToPathForm();
+    editFormComponent.removeEventListener('click', onClickPopupForm);
   };
-
-  pathFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
-    replacePathFormToEditForm();
-  });
-
-  editFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
-    replaceEditFormToPathForm();
-    window.addEventListener('click', onClickPopupForm);
-  });
-
-  editFormComponent.getElement().addEventListener('submit', (event) => {
-    event.preventDefault();
-    replaceEditFormToPathForm();
-  });
 
   const onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (isEscEvent(evt)) {
       evt.preventDefault();
       replaceEditFormToPathForm();
       document.removeEventListener('keydown', onEscKeyDown);
     }
   };
-  window.addEventListener('keydown', () => {
+
+  pathFormComponent.setPathClickHandler(() => {
+    replacePathFormToEditForm();
+    document.addEventListener('keydown', onEscKeyDown);
+  });
+
+  editFormComponent.setEditClickHandler(() => {
     replaceEditFormToPathForm();
-    window.addEventListener('keydown', onEscKeyDown);
+    editFormComponent.addEventListener('click', onClickPopupForm);
+  });
+
+  editFormComponent.setEditSubmitHandler(() => {
+    replaceEditFormToPathForm();
+    editFormComponent.addEventListener('submit', onClickPopupForm);
   });
 
   render(pathList, pathFormComponent.getElement(), RenderPostition.BEFOREEND);

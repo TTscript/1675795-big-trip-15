@@ -1,4 +1,4 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract.js';
 
 const createPathFormTemplate = (tasks) => {
 
@@ -44,25 +44,25 @@ const createPathFormTemplate = (tasks) => {
   return createRoutePoint();
 };
 
-export default class PathForm {
+export default class PathForm extends AbstractView {
   constructor(tasks) {
+    super();
     this._tasks = tasks;
-    this._element = null;
+    this._pathClickHandler = this._pathClickHandler.bind(this);
   }
 
   getTemplate() {
     return createPathFormTemplate(this._tasks);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _pathClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setPathClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._pathClickHandler);
   }
 }
 

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { getRandomInteger } from './utils.js';
+import { getRandomInteger } from './utils/common.js';
 
 const MAX_PRICE = 5000;
 const MAX_QUANTITY_GENERAL_DESCRIPTION = 4;

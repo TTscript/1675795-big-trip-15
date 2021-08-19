@@ -1,4 +1,4 @@
-import { getRandomInteger } from './utils.js';
+import { getRandomInteger } from './utils/common.js';
 
 export const createFormTemplate = (tasks, resetButtonName) => {
   const {type, destination, dateFrom, dateTo, basicPrice, offers} = tasks;
