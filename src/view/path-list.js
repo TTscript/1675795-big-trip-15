@@ -1,24 +1,9 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract.js';
 
 const createPathList = () => ('<ul class="trip-events__list"></ul>');
 
-export default class PathList {
-  constructor() {
-    this._element = null;
-  }
-
+export default class PathList extends AbstractView {
   getTemplate() {
     return createPathList();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
