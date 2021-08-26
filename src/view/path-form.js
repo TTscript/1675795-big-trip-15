@@ -2,7 +2,12 @@ import AbstractView from './abstract.js';
 
 const createPathFormTemplate = (tasks) => {
 
-  const {type, destination, dateFrom, dateTo, basicPrice} = tasks;
+  const {type, destination, dateFrom, dateTo, basicPrice, isFavorite} = tasks;
+  const determineFavorites = () => {
+    if (isFavorite === true) {
+      return 'event__favorite-btn--active';
+    }
+  };
   const createRoutePoint = () =>
     `<li class="trip-events__item">
     <div class="event">
@@ -30,7 +35,7 @@ const createPathFormTemplate = (tasks) => {
           <span class="event__offer-price">${basicPrice}</span>
         </li>
       </ul>
-      <button class="event__favorite-btn event__favorite-btn--active" type="button">
+      <button class="event__favorite-btn ${determineFavorites()}" type="button">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
           <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -45,14 +50,25 @@ const createPathFormTemplate = (tasks) => {
 };
 
 export default class PathForm extends AbstractView {
-  constructor(tasks) {
+  constructor(task) {
     super();
-    this._tasks = tasks;
+    this._task = task;
     this._pathClickHandler = this._pathClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createPathFormTemplate(this._tasks);
+    return createPathFormTemplate(this._task);
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  setPathFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector('.event__favorite-icon').addEventListener('click', this._favoriteClickHandler);
   }
 
   _pathClickHandler(evt) {
@@ -64,5 +80,7 @@ export default class PathForm extends AbstractView {
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._pathClickHandler);
   }
+
+
 }
 

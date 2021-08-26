@@ -6,10 +6,24 @@ export const createFormTemplate = (tasks, resetButtonName) => {
 
   const createPhotos = () => {
     const photos = [];
-    for (let i = 0; i < destination.pictures.length; i++) {
-      photos.push(`<img class="event__photo" src=${destination.pictures[i].src}>`);
-    }
+    destination.pictures.forEach((photo) => {
+      photos.push(`<img class="event__photo" src=${photo.src}>`);
+    });
+
     return photos.join('');
+  };
+
+  const Offer = {
+    BUSINESS: 'Upgrade to a business class',
+    RADIO: 'Choose the radio station',
+    UBER: 'Order Uber',
+    LUGGAGE: 'Add luggage',
+    CAR: 'Rent a car',
+    BREAKFAST: 'Add breakfast',
+    COMFORT: 'Switch to comfort',
+    SEAT: 'Choose seats',
+    TRAIN: 'Travel by train',
+    MEAL: 'Add meal',
   };
 
   const createOffersRender = () => {
@@ -18,34 +32,34 @@ export const createFormTemplate = (tasks, resetButtonName) => {
     for (let i = 0; i < offers.offer.length; i++) {
       let bend = '';
       switch (offers.offer[i].title) {
-        case 'Upgrade to a business class':
+        case Offer.BUSINESS:
           bend = 'business-class';
           break;
-        case 'Choose the radio station':
+        case Offer.RADIO:
           bend = 'radio-station';
           break;
-        case 'Order Uber':
+        case Offer.UBER:
           bend = 'order-uber';
           break;
-        case 'Add luggage':
+        case Offer.LUGGAGE:
           bend = 'luggage';
           break;
-        case 'Rent a car':
+        case Offer.CAR:
           bend = 'rent-car';
           break;
-        case 'Add breakfast':
+        case Offer.BREAKFAST:
           bend = 'breakfast';
           break;
-        case 'Switch to comfort':
+        case Offer.COMFORT:
           bend = 'comfort';
           break;
-        case 'Choose seats':
+        case Offer.SEAT:
           bend = 'seats';
           break;
-        case 'Travel by train':
+        case Offer.TRAIN:
           bend = 'train';
           break;
-        case 'Add meal':
+        case Offer.MEAL:
           bend = 'meal';
           break;
       }
