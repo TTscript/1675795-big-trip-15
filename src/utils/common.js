@@ -30,7 +30,7 @@ const createElement = (template) => {
   return newElement.firstChild;
 };
 
-const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+const isEscPressed = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
 const updateItem = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
@@ -46,4 +46,4 @@ const updateItem = (items, update) => {
   ];
 };
 
-export { getRandomInteger, getRandomIntegerMultiplesFive, renderTemplate, createElement, isEscEvent, updateItem };
+export { getRandomInteger, getRandomIntegerMultiplesFive, renderTemplate, createElement, isEscPressed, updateItem };

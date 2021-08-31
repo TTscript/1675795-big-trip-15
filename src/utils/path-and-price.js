@@ -1,16 +1,16 @@
 import { constants } from '../constants.js';
 const getTotalPrice = () => {
   let totalPrice = 0;
-  constants.tasks.forEach((task) => {
-    totalPrice += task.basicPrice;
+  constants.paths.forEach((path) => {
+    totalPrice += path.basicPrice;
   });
   return totalPrice;
 };
 
 const getTotalPathes = () => {
   const totalPathes = [];
-  constants.tasks.forEach((task) => {
-    totalPathes.push(task.destination.name);
+  constants.paths.forEach((path) => {
+    totalPathes.push(path.destination.name);
   });
   return totalPathes;
 };

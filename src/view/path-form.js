@@ -1,13 +1,15 @@
 import AbstractView from './abstract.js';
+// import dayjs from 'dayjs';
 
-const createPathFormTemplate = (tasks) => {
+const createPathFormTemplate = (paths) => {
 
-  const {type, destination, dateFrom, dateTo, basicPrice, isFavorite} = tasks;
+  const {type, destination, dateFrom, dateTo, totalPathTime, basicPrice, isFavorite} = paths;
   const determineFavorites = () => {
     if (isFavorite === true) {
       return 'event__favorite-btn--active';
     }
   };
+
   const createRoutePoint = () =>
     `<li class="trip-events__item">
     <div class="event">
@@ -18,11 +20,11 @@ const createPathFormTemplate = (tasks) => {
       <h3 class="event__title">${type} ${destination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-18T10:30">${dateFrom.format('HH:MM')}</time>
+          <time class="event__start-time" datetime="2019-03-18T10:30">${dateFrom.format('HH:mm')}</time>
           &mdash;
-          <time class="event__end-time" datetime="2019-03-18T11:00">${dateTo.format('HH:MM')}</time>
+          <time class="event__end-time" datetime="2019-03-18T11:00">${dateTo.format('HH:mm')}</time>
         </p>
-        <p class="event__duration">30M</p>
+        <p class="event__duration">${totalPathTime}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${basicPrice}</span>
@@ -50,15 +52,15 @@ const createPathFormTemplate = (tasks) => {
 };
 
 export default class PathForm extends AbstractView {
-  constructor(task) {
+  constructor(path) {
     super();
-    this._task = task;
+    this._path = path;
     this._pathClickHandler = this._pathClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createPathFormTemplate(this._task);
+    return createPathFormTemplate(this._path);
   }
 
   _favoriteClickHandler(evt) {
@@ -80,7 +82,5 @@ export default class PathForm extends AbstractView {
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._pathClickHandler);
   }
-
-
 }
 

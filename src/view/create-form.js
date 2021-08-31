@@ -2,13 +2,13 @@ import AbstractView from './abstract.js';
 import { createFormTemplate } from '../form-template.js';
 
 export default class NewForm extends AbstractView {
-  constructor(tasks) {
+  constructor(paths) {
     super();
-    this._tasks = tasks;
+    this._paths = paths;
     this._resetButtonName = 'Cancel';
   }
 
   getTemplate() {
-    return createFormTemplate(this._tasks, this._resetButtonName);
+    return createFormTemplate(this._paths, this._resetButtonName);
   }
 }

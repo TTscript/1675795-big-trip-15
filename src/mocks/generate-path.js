@@ -2,11 +2,11 @@ import dayjs from 'dayjs';
 import { generateTypes, generateOffer } from './generate-offer.js';
 import { generateDestination } from './generate-destination.js';
 import { generateBasicPrice } from './generate-basic-price.js';
-import { generateDate } from './generate-date.js';
+import { generateDate, getTimeDifference } from './generate-date.js';
 import { generateFavorites } from './generate-favorites.js';
 import { nanoid } from 'nanoid';
 
-const generateTask = () => {
+export const generatePath = () => {
   const basicPrice = generateBasicPrice();
   let dateFrom = dayjs(generateDate());
   let dateTo = dayjs(generateDate());
@@ -20,11 +20,13 @@ const generateTask = () => {
   const isFavorite = generateFavorites();
   const offers = generateOffer();
   const type = generateTypes();
+  const totalPathTime = getTimeDifference(dateFrom, dateTo);
 
   return {
     basicPrice,
     dateFrom,
     dateTo,
+    totalPathTime,
     destination,
     id,
     isFavorite,
@@ -32,6 +34,4 @@ const generateTask = () => {
     offers,
   };
 };
-
-export {generateTask};
 

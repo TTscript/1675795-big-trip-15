@@ -1,6 +1,7 @@
 import EditFormView from '../view/edit-form.js';
 import PathFormView from '../view/path-form.js';
 import { RenderPostition, render, replace, remove } from '../utils/render.js';
+import { isEscPressed } from '../utils/common.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -24,40 +25,37 @@ export default class Path {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
-  init(task) {
-    this._task = task;
+  init(path) {
+    this._path = path;
 
-    const prevPathComponent = this._pathComponent;
-    const prevPathEditComponent = this._pathEditComponent;
+    const previousPathComponent = this._pathComponent;
 
-    this._pathComponent = new PathFormView(task);
-    this._editComponent = new EditFormView(task);
+    this._pathComponent = new PathFormView(path);
+    this._editComponent = new EditFormView(path);
 
     this._pathComponent.setPathClickHandler(this._handlePathClick);
     this._editComponent.setEditSubmitHandler(this._handleFormSubmit);
     this._editComponent.setEditClickHandler(this._handleEditClick);
     this._pathComponent.setPathFavoriteClickHandler(this._handleFavoriteClick);
 
-    if (prevPathComponent === null || prevPathEditComponent === null) {
+    if (previousPathComponent === null) {
       render(this._pathListContainer, this._pathComponent, RenderPostition.BEFOREEND);
       return;
     }
 
     if (this._mode === Mode.DEFAULT) {
-      replace(this._pathComponent, prevPathComponent);
+      replace(this._pathComponent, previousPathComponent);
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._pathEditComponent, prevPathEditComponent);
+      replace(this._pathEditComponent, previousPathComponent);
     }
 
-    remove(prevPathComponent);
-    remove(prevPathEditComponent);
+    remove(previousPathComponent);
   }
 
   destroy() {
     remove(this._pathComponent);
-    remove(this._pathEditComponent);
   }
 
   resetView() {
@@ -80,7 +78,7 @@ export default class Path {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (isEscPressed) {
       evt.preventDefault();
       this._replaceFormToPath();
     }
@@ -90,9 +88,9 @@ export default class Path {
     this._changeData(
       Object.assign(
         {},
-        this._task,
+        this._path,
         {
-          isFavorite: !this._task.isFavorite,
+          isFavorite: !this._path.isFavorite,
         },
       ),
     );
