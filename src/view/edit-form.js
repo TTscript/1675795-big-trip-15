@@ -2,16 +2,16 @@ import AbstractView from './abstract.js';
 import { createFormTemplate } from '../form-template.js';
 
 export default class EditForm extends AbstractView {
-  constructor(tasks) {
+  constructor(paths) {
     super();
-    this._tasks = tasks;
+    this._paths = paths;
     this._resetButtonName = 'Delete';
     this._clickHandler = this._clickHandler.bind(this);
     this._formHandler = this._formHandler.bind(this);
   }
 
   getTemplate() {
-    return createFormTemplate(this._tasks, this._resetButtonName);
+    return createFormTemplate(this._paths, this._resetButtonName);
   }
 
   _clickHandler(evt) {
@@ -33,5 +33,4 @@ export default class EditForm extends AbstractView {
     this._callback.formClick = callback;
     this.getElement().addEventListener('submit', this._formHandler);
   }
-
 }

@@ -7,8 +7,10 @@ import TripPriceView from '../view/trip-price.js';
 import SortView from '../view/sort.js';
 import EmptyListView from '../view/empty-pathes-list.js';
 import { getTotalPrice, getTotalPathes } from '../utils/path-and-price.js';
-import PathView from './path.js';
+import PathPresenter from './path.js';
 import { updateItem } from '../utils/common.js';
+import { sortByDefault, sortByDay, sortByTime, sortByPrice } from '../utils/path-util.js';
+import { SortType } from '../constants';
 
 export default class Trip {
   constructor(tripMenu, tripEvents, tripNav, filters) {
@@ -17,7 +19,8 @@ export default class Trip {
     this._tripNav = tripNav;
     this._filters = filters;
     this._pathListComponent = constants.pathListComponent;
-    this._pathPresenter = new Map();
+    this._pathPresenters = new Map();
+    this._currentSortType = SortType.DEFAULT;
 
     this._siteMenu = new SiteMenuView();
     this._siteFilters = new FilterView();
@@ -26,27 +29,63 @@ export default class Trip {
     this._tripPath = new TripPathView(getTotalPathes());
     this._sort = new SortView();
 
-    this._handleTaskChange = this._handleTaskChange.bind(this);
+    this._handlePathChange = this._handlePathChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
-  init(tasks) {
-    this._tasks = tasks.slice();
+  init(paths) {
+    this._paths = paths.slice();
+    this._sourcePaths = paths.slice();
 
     this._renderSiteMenu();
     this._renderSiteFilters();
 
     this._renderTrip();
-    this._renderPathes(tasks);
+  }
+
+  _sortPaths(sortType) {
+    switch (sortType) {
+      case SortType.DAY:
+        this._paths.sort(sortByDay);
+        break;
+      case SortType.TIME:
+        this._paths.sort(sortByTime);
+        break;
+      case SortType.PRICE:
+        this._paths.sort(sortByPrice);
+        break;
+      default:
+        this._paths = this._sourcePaths.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._sortPaths(sortType);
+    this._clearPathList();
+    this._renderPaths();
+  }
+
+  _renderSort() {
+    render(this._pathListComponent, this._sort, RenderPostition.BEFOREBEGIN);
+    this._sort.setSortTypeChangeHandler(this._handleSortTypeChange);
+    if (this._currentSortType === 'default') {
+      this._paths.sort(sortByDefault);
+    }
   }
 
   _handleModeChange() {
-    this._pathPresenter.forEach((presenter) => presenter.resetView());
+    this._pathPresenters.forEach((presenter) => presenter.resetView());
   }
 
-  _handleTaskChange(updatedTask) {
-    this._tasks = updateItem(this._tasks, updatedTask);
-    this._pathPresenter.get(updatedTask.id).init(updatedTask);
+  _handlePathChange(updatedPath) {
+    this._paths = updateItem(this._paths, updatedPath);
+    this._pathPresenters.get(updatedPath.id).init(updatedPath);
   }
 
   _renderSiteMenu() {
@@ -57,7 +96,7 @@ export default class Trip {
     render(this._tripMenu, this._tripPrice, RenderPostition.AFTERBEGIN);
   }
 
-  _renderTripPathes() {
+  _renderTripPaths() {
     render(this._tripMenu, this._tripPath, RenderPostition.AFTERBEGIN);
   }
 
@@ -65,25 +104,21 @@ export default class Trip {
     render(this._tripEvents, constants.pathListComponent, RenderPostition.AFTERBEGIN);
   }
 
-  _renderPath(task) {
-    const pathPresenter = new PathView(this._pathListComponent, this._handleTaskChange, this._handleModeChange);
-    pathPresenter.init(task);
-    this._pathPresenter.set(task.id, pathPresenter);
+  _renderPath(path) {
+    const pathPresenter = new PathPresenter(this._pathListComponent, this._handlePathChange, this._handleModeChange);
+    pathPresenter.init(path);
+    this._pathPresenters.set(path.id, pathPresenter);
   }
 
-  _renderPathes(from, to) {
-    this._tasks
+  _renderPaths(from, to) {
+    this._paths
       .slice(from, to)
-      .forEach((task) => this._renderPath(task));
+      .forEach((path) => this._renderPath(path));
   }
 
   _clearPathList() {
-    this._pathPresenter.forEach((presenter) => presenter.destroy());
-    this._pathPresenter.clear();
-  }
-
-  _renderSort() {
-    render(this._pathListComponent, this._sort, RenderPostition.BEFOREBEGIN);
+    this._pathPresenters.forEach((presenter) => presenter.destroy());
+    this._pathPresenters.clear();
   }
 
   _renderSiteFilters() {
@@ -95,14 +130,15 @@ export default class Trip {
   }
 
   _renderTrip() {
-    if (this._tasks.length === 0) {
+    if (!this._paths.length) {
       this._renderEmptyList();
-    } else {
-      this._renderTripPrice();
-      this._renderTripPathes();
-      this._renderPathList();
-      this._renderSort();
     }
+
+    this._renderTripPrice();
+    this._renderTripPaths();
+    this._renderPathList();
+    this._renderSort();
+    this._renderPaths();
   }
 }
 
