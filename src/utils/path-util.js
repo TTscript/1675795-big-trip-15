@@ -4,9 +4,9 @@ const sortByDefault = (pathA, pathB) => dayjs(pathA.dateFrom).diff(dayjs(pathB.d
 
 const sortByDay = (pathA, pathB) => dayjs(pathB.dateFrom).diff(dayjs(pathA.dateFrom));
 
-const sortByPrice = (pathA, pathB) => pathA.basicPrice - pathB.basicPrice;
+const sortByPrice = (pathA, pathB) => pathB.basicPrice - pathA.basicPrice;
 
-const sortByTime = (pathA, pathB) => pathA.totalPathTime.replace(['H'], '.').replace(['M'], '') - pathB.totalPathTime.replace(['H'], '.').replace(['M'], '');
+const sortByTime = (pathA, pathB) =>  pathB.totalPathTime.replace(['H'], '.').replace(['M'], '') - pathA.totalPathTime.replace(['H'], '.').replace(['M'], '');
 
 export { sortByDefault, sortByDay, sortByTime, sortByPrice };
 

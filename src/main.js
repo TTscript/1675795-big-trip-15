@@ -11,3 +11,4 @@ const filters = document.querySelector('.trip-controls__filters');
 const tripPresenter = new TripView(tripMenu, tripEvents, tripNav, filters);
 tripPresenter.init(constants.paths);
 
+

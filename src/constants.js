@@ -18,4 +18,17 @@ const SortType = {
   PRICE: 'price',
 };
 
-export { constants, SortType };
+const Offer = {
+  BUSINESS: 'Upgrade to a business class',
+  RADIO: 'Choose the radio station',
+  UBER: 'Order Uber',
+  LUGGAGE: 'Add luggage',
+  CAR: 'Rent a car',
+  BREAKFAST: 'Add breakfast',
+  COMFORT: 'Switch to comfort',
+  SEAT: 'Choose seats',
+  TRAIN: 'Travel by train',
+  MEAL: 'Add meal',
+};
+
+export { constants, SortType, Offer };

@@ -74,7 +74,7 @@ export default class Trip {
   _renderSort() {
     render(this._pathListComponent, this._sort, RenderPostition.BEFOREBEGIN);
     this._sort.setSortTypeChangeHandler(this._handleSortTypeChange);
-    if (this._currentSortType === 'default') {
+    if (this._currentSortType === SortType.DEFAULT) {
       this._paths.sort(sortByDefault);
     }
   }

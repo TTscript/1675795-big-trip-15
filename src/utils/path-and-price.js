@@ -12,6 +12,14 @@ const getTotalPathes = () => {
   constants.paths.forEach((path) => {
     totalPathes.push(path.destination.name);
   });
+
+  if (totalPathes.length > 3) {
+    const fillingTotalPathes = [];
+    fillingTotalPathes.push(totalPathes[0]);
+    fillingTotalPathes.push('. . .');
+    fillingTotalPathes.push(totalPathes[totalPathes.length - 1]);
+    return fillingTotalPathes;
+  }
   return totalPathes;
 };
 

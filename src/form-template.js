@@ -1,89 +1,15 @@
-import { getRandomInteger } from './utils/common.js';
-
-export const createFormTemplate = (tasks, resetButtonName) => {
-  const {type, destination, dateFrom, dateTo, basicPrice, offers} = tasks;
+import { createOffersRender, createPhotos, createDataListOptions } from './utils/render.js';
 
 
-  const createPhotos = () => {
-    const photos = [];
-    destination.pictures.forEach((photo) => {
-      photos.push(`<img class="event__photo" src=${photo.src}>`);
-    });
-
-    return photos.join('');
-  };
-
-  const Offer = {
-    BUSINESS: 'Upgrade to a business class',
-    RADIO: 'Choose the radio station',
-    UBER: 'Order Uber',
-    LUGGAGE: 'Add luggage',
-    CAR: 'Rent a car',
-    BREAKFAST: 'Add breakfast',
-    COMFORT: 'Switch to comfort',
-    SEAT: 'Choose seats',
-    TRAIN: 'Travel by train',
-    MEAL: 'Add meal',
-  };
-
-  const createOffersRender = () => {
-    const offersBlock = [];
-
-    for (let i = 0; i < offers.offer.length; i++) {
-      let bend = '';
-      switch (offers.offer[i].title) {
-        case Offer.BUSINESS:
-          bend = 'business-class';
-          break;
-        case Offer.RADIO:
-          bend = 'radio-station';
-          break;
-        case Offer.UBER:
-          bend = 'order-uber';
-          break;
-        case Offer.LUGGAGE:
-          bend = 'luggage';
-          break;
-        case Offer.CAR:
-          bend = 'rent-car';
-          break;
-        case Offer.BREAKFAST:
-          bend = 'breakfast';
-          break;
-        case Offer.COMFORT:
-          bend = 'comfort';
-          break;
-        case Offer.SEAT:
-          bend = 'seats';
-          break;
-        case Offer.TRAIN:
-          bend = 'train';
-          break;
-        case Offer.MEAL:
-          bend = 'meal';
-          break;
-      }
-
-      const isChecked = () => Boolean(getRandomInteger(0, 1)) === true ? 'checked' : '';
-
-      offersBlock.push(`<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${bend}-1" type="checkbox" name="event-offer-${bend}" ${isChecked()}>
-      <label class="event__offer-label" for="event-offer-${bend}-1">
-        <span class="event__offer-title">${offers.offer[i].title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offers.offer[i].price}</span>
-      </label>
-    </div>`);
-    }
-    return offersBlock.join('');
-  };
+export const createFormTemplate = (data, resetButtonName) => {
+  const {type, destination, dateFrom, dateTo, basicPrice, offers, id} = data;
 
   return `<form class="event event--edit" action="#" method="post">
 <header class="event__header">
   <div class="event__type-wrapper">
     <label class="event__type  event__type-btn" for="event-type-toggle-1">
       <span class="visually-hidden">Choose event type</span>
-      <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+      <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
     </label>
     <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -122,7 +48,7 @@ export const createFormTemplate = (tasks, resetButtonName) => {
         </div>
 
         <div class="event__type-item">
-          <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+          <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
           <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
         </div>
 
@@ -148,11 +74,9 @@ export const createFormTemplate = (tasks, resetButtonName) => {
     <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
     </label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
-    <datalist id="destination-list-1">
-      <option value="Amsterdam"></option>
-      <option value="Geneva"></option>
-      <option value="Chamonix"></option>
+    <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="${id}">
+    <datalist class="event__datalist" id="${id}">
+      ${createDataListOptions().join('')}
     </datalist>
   </div>
 
@@ -179,23 +103,20 @@ export const createFormTemplate = (tasks, resetButtonName) => {
   </button>
 </header>
 <section class="event__details">
-  <section class="event__section  event__section--offers">
-    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-    <div class="event__available-offers">
-      ${createOffersRender()}
-    </div>
+    <section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+        <div class="event__available-offers">
+          ${createOffersRender(offers)}
+        </div>
+    </section>
   </section>
-
   <section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
     <p class="event__destination-description">${destination.description}</p>
-
-
     <div class="event__photos-container">
-    <div class="event__photos-tape">
-    ${createPhotos()}
-    </div>
+      <div class="event__photos-tape">
+        ${createPhotos(destination)}
+      </div>
     </div>
   </section>
 </section>

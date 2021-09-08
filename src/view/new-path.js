@@ -4,11 +4,11 @@ import { generateOffer } from '../mocks/generate-offer.js';
 import { generateDescription, generateRandomPhoto } from '../mocks/generate-destination.js';
 import { mocksConstants } from '../mocks/mock-constants.js';
 
-export default class EditForm extends SmartView {
-  constructor(path) {
+export default class NewPath extends SmartView {
+  constructor(paths) {
     super();
-    this._data = EditForm.parsePathToData(path);
-    this._resetButtonName = 'Delete';
+    this._paths = paths;
+    this._resetButtonName = 'Cancel';
     this._clickHandler = this._clickHandler.bind(this);
     this._formHandler = this._formHandler.bind(this);
     this._changeTypeClickHandler = this._changeTypeClickHandler.bind(this);
@@ -18,13 +18,7 @@ export default class EditForm extends SmartView {
   }
 
   getTemplate() {
-    return createFormTemplate(this._data, this._resetButtonName);
-  }
-
-  reset(path) {
-    this.updateData(
-      EditForm.parsePathToData(path),
-    );
+    return createFormTemplate(this._paths, this._resetButtonName);
   }
 
   restoreHandlers() {
@@ -90,14 +84,14 @@ export default class EditForm extends SmartView {
     this._callback.editClick();
   }
 
+  _formHandler(evt) {
+    evt.preventDefault();
+    this._callback.formClick(NewPath.parseDataToPath(this._data));
+  }
+
   setEditClickHandler(callback) {
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
-  }
-
-  _formHandler(evt) {
-    evt.preventDefault();
-    this._callback.formClick(EditForm.parseDataToPath(this._data));
   }
 
   setEditSubmitHandler(callback) {
