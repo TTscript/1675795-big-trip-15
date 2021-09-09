@@ -3,9 +3,9 @@ import { createFormTemplate } from '../form-template.js';
 import { generateOffer } from '../mocks/generate-offer.js';
 import { generateDescription, generateRandomPhoto } from '../mocks/generate-destination.js';
 import { mocksConstants } from '../mocks/mock-constants.js';
-import flatpickr from 'flatpickr';
+// import flatpickr from 'flatpickr';
 
-import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+// import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 
 export default class EditForm extends SmartView {
@@ -19,46 +19,46 @@ export default class EditForm extends SmartView {
     this._formHandler = this._formHandler.bind(this);
     this._changeTypeClickHandler = this._changeTypeClickHandler.bind(this);
     this._changeDestinationClickHandler = this._changeDestinationClickHandler.bind(this);
-    this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
+    // this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
 
     this._setInnerHandlers();
-    this._setDatepicker();
+    // this._setDatepicker();
   }
 
   getTemplate() {
     return createFormTemplate(this._data, this._resetButtonName);
   }
 
-  _setDatepicker() {
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
+  // _setDatepicker() {
+  //   if (this._datepicker) {
+  //     this._datepicker.destroy();
+  //     this._datepicker = null;
+  //   }
 
-    this._datepicker = flatpickr(
-      this.getElement().querySelector('#event-start-time-1'),
-      {
-        dateFormat: 'd/m/Y',
-        defaultDate: this._data.dateFrom,
-        onChange: this._dueDateChangeHandler,
-      },
-    );
+  //   this._datepicker = flatpickr(
+  //     this.getElement().querySelector('#event-start-time-1'),
+  //     {
+  //       dateFormat: 'd/m/Y',
+  //       defaultDate: this._data.dateFrom,
+  //       onChange: this._dueDateChangeHandler,
+  //     },
+  //   );
 
-    this._datepicker = flatpickr(
-      this.getElement().querySelector('#event-end-time-1'),
-      {
-        dateFormat: 'd/m/Y',
-        defaultDate: this._data.dateFrom,
-        onChange: this._dueDateChangeHandler,
-      },
-    );
-  }
+  //   this._datepicker = flatpickr(
+  //     this.getElement().querySelector('#event-end-time-1'),
+  //     {
+  //       dateFormat: 'd/m/Y',
+  //       defaultDate: this._data.dateFrom,
+  //       onChange: this._dueDateChangeHandler,
+  //     },
+  //   );
+  // }
 
-  _dueDateChangeHandler([userDate]) {
-    this.updateData({
-      dateFrom: userDate.format('DD/MM/YY HH:MM'),
-    });
-  }
+  // _dueDateChangeHandler([userDate]) {
+  //   this.updateData({
+  //     dateFrom: userDate.format('DD/MM/YY HH:MM'),
+  //   });
+  // }
 
   reset(path) {
     this.updateData(
