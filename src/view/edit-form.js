@@ -4,9 +4,10 @@ import { generateOffer } from '../mocks/generate-offer.js';
 import { generateDescription, generateRandomPhoto } from '../mocks/generate-destination.js';
 import { mocksConstants } from '../mocks/mock-constants.js';
 import flatpickr from 'flatpickr';
+import rangePlugin from '../../node_modules/flatpickr/dist/plugins/rangePlugin';
+import confirmDatePlugin from '../../node_modules/flatpickr/dist/plugins/confirmDate/confirmDate';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-
 
 export default class EditForm extends SmartView {
   constructor(path) {
@@ -38,25 +39,17 @@ export default class EditForm extends SmartView {
     this._datepicker = flatpickr(
       this.getElement().querySelector('#event-start-time-1'),
       {
-        dateFormat: 'd/m/Y',
-        defaultDate: this._data.dateFrom,
+        enableTime: true,
+        dateFormat: 'd/m/Y H:i',
         onChange: this._dueDateChangeHandler,
-      },
-    );
-
-    this._datepicker = flatpickr(
-      this.getElement().querySelector('#event-end-time-1'),
-      {
-        dateFormat: 'd/m/Y',
-        defaultDate: this._data.dateFrom,
-        onChange: this._dueDateChangeHandler,
-      },
-    );
+        'plugins': [new confirmDatePlugin({})],
+        'plugins': [new rangePlugin({ input: this.getElement().querySelector('#event-end-time-1')})],
+      });
   }
 
   _dueDateChangeHandler([userDate]) {
     this.updateData({
-      dateFrom: userDate.format('DD/MM/YY HH:MM'),
+      dateFrom: userDate,
     });
   }
 
