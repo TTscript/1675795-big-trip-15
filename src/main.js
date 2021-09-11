@@ -2,7 +2,6 @@
 import TripView from './presenter/trip.js';
 import { constants } from './constants.js';
 
-
 const tripMenu = document.querySelector('.trip-main');
 const tripEvents = document.querySelector('.trip-events');
 const tripNav = tripMenu.querySelector('.trip-controls__navigation');

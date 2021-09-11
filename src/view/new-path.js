@@ -3,67 +3,28 @@ import { createFormTemplate } from '../form-template.js';
 import { generateOffer } from '../mocks/generate-offer.js';
 import { generateDescription, generateRandomPhoto } from '../mocks/generate-destination.js';
 import { mocksConstants } from '../mocks/mock-constants.js';
-import flatpickr from 'flatpickr';
-import rangePlugin from '../../node_modules/flatpickr/dist/plugins/rangePlugin';
-import confirmDatePlugin from '../../node_modules/flatpickr/dist/plugins/confirmDate/confirmDate';
 
-import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-
-export default class EditForm extends SmartView {
-  constructor(path) {
+export default class NewPath extends SmartView {
+  constructor(paths) {
     super();
-    this._data = EditForm.parsePathToData(path);
-    this._datepicker = null;
-
-    this._resetButtonName = 'Delete';
+    this._paths = paths;
+    this._resetButtonName = 'Cancel';
     this._clickHandler = this._clickHandler.bind(this);
     this._formHandler = this._formHandler.bind(this);
     this._changeTypeClickHandler = this._changeTypeClickHandler.bind(this);
     this._changeDestinationClickHandler = this._changeDestinationClickHandler.bind(this);
-    this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
 
     this._setInnerHandlers();
-    this._setDatepicker();
   }
 
   getTemplate() {
-    return createFormTemplate(this._data, this._resetButtonName);
-  }
-
-  _setDatepicker() {
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
-
-    this._datepicker = flatpickr(
-      this.getElement().querySelector('#event-start-time-1'),
-      {
-        enableTime: true,
-        dateFormat: 'd/m/Y H:i',
-        onChange: this._dueDateChangeHandler,
-        'plugins': [new confirmDatePlugin({})],
-        'plugins': [new rangePlugin({ input: this.getElement().querySelector('#event-end-time-1')})],
-      });
-  }
-
-  _dueDateChangeHandler([userDate]) {
-    this.updateData({
-      dateFrom: userDate,
-    });
-  }
-
-  reset(path) {
-    this.updateData(
-      EditForm.parsePathToData(path),
-    );
+    return createFormTemplate(this._paths, this._resetButtonName);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this.setEditClickHandler(this._callback.editClick);
     this.setEditSubmitHandler(this._callback.formClick);
-    this._setDatepicker();
   }
 
   _setInnerHandlers() {
@@ -123,14 +84,14 @@ export default class EditForm extends SmartView {
     this._callback.editClick();
   }
 
+  _formHandler(evt) {
+    evt.preventDefault();
+    this._callback.formClick(NewPath.parseDataToPath(this._data));
+  }
+
   setEditClickHandler(callback) {
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
-  }
-
-  _formHandler(evt) {
-    evt.preventDefault();
-    this._callback.formClick(EditForm.parseDataToPath(this._data));
   }
 
   setEditSubmitHandler(callback) {

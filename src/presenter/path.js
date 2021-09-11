@@ -37,6 +37,7 @@ export default class Path {
     this._editComponent.setEditSubmitHandler(this._handleFormSubmit);
     this._editComponent.setEditClickHandler(this._handleEditClick);
     this._pathComponent.setPathFavoriteClickHandler(this._handleFavoriteClick);
+    this._editComponent.setChangeTypeClickHandler(this._handleChangeTypeClick);
 
     if (previousPathComponent === null) {
       render(this._pathListContainer, this._pathComponent, RenderPostition.BEFOREEND);
@@ -73,13 +74,14 @@ export default class Path {
 
   _replaceFormToPath() {
     replace(this._pathComponent, this._editComponent);
-    document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _escKeyDownHandler(evt) {
-    if (isEscPressed) {
+    if (isEscPressed(evt)) {
       evt.preventDefault();
+      this._editComponent.reset(this._path);
       this._replaceFormToPath();
     }
   }
@@ -105,6 +107,7 @@ export default class Path {
   }
 
   _handleEditClick() {
+    this._editComponent.reset(this._path);
     this._replaceFormToPath();
   }
 }

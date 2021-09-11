@@ -28,4 +28,4 @@ const generateDestination = () => {
   return destination;
 };
 
-export { generateDestination };
+export { generateDestination, generateDescription, generateRandomPhoto };
