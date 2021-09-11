@@ -1,4 +1,4 @@
-import { createOffersRender, createPhotos, createDataListOptions } from './utils/render.js';
+import { createOffersRender, createPhotos, createDataListOptions } from '../utils/render.js';
 
 
 export const createFormTemplate = (data, resetButtonName) => {

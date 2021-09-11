@@ -1,19 +1,19 @@
 import SmartView from './smart.js';
-import { createFormTemplate } from '../form-template.js';
+import { createFormTemplate } from './form-template.js';
 import { generateOffer } from '../mocks/generate-offer.js';
 import { generateDescription, generateRandomPhoto } from '../mocks/generate-destination.js';
 import { mocksConstants } from '../mocks/mock-constants.js';
 import flatpickr from 'flatpickr';
 import rangePlugin from '../../node_modules/flatpickr/dist/plugins/rangePlugin';
-import confirmDatePlugin from '../../node_modules/flatpickr/dist/plugins/confirmDate/confirmDate';
-
-import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/flatpickr.min.css';
 
 export default class EditForm extends SmartView {
   constructor(path) {
     super();
     this._data = EditForm.parsePathToData(path);
     this._datepicker = null;
+    this._dateFrom = path.dateFrom.format('DD/MM/YYYY HH:mm');
+    this._dateTo = path.dateTo.format('DD/MM/YYYY HH:mm');
 
     this._resetButtonName = 'Delete';
     this._clickHandler = this._clickHandler.bind(this);
@@ -41,15 +41,17 @@ export default class EditForm extends SmartView {
       {
         enableTime: true,
         dateFormat: 'd/m/Y H:i',
-        onChange: this._dueDateChangeHandler,
-        'plugins': [new confirmDatePlugin({})],
+        defaultDate: this._dateFrom,
+        onClose: this._dueDateChangeHandler,
         'plugins': [new rangePlugin({ input: this.getElement().querySelector('#event-end-time-1')})],
-      });
+      },
+    );
   }
 
-  _dueDateChangeHandler([userDate]) {
+  _dueDateChangeHandler() {
     this.updateData({
-      dateFrom: userDate,
+      dateFrom: this.getElement().querySelector('#event-start-time-1').value,
+      dateTo: this.getElement().querySelector('#event-end-time-1').value,
     });
   }
 
