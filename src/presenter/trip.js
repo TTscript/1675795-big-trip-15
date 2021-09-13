@@ -9,7 +9,7 @@ import EmptyListView from '../view/empty-pathes-list.js';
 import { getTotalPrice, getTotalPathes } from '../utils/path-and-price.js';
 import PathPresenter from './path.js';
 import { updateItem } from '../utils/common.js';
-import { sortByDefault, sortByDay, sortByTime, sortByPrice } from '../utils/path-util.js';
+import { sortByDefault, sortByDay, sortByTime, sortByPrice } from '../utils/path-utils.js';
 import { SortType } from '../constants';
 
 export default class Trip {
