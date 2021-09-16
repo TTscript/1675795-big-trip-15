@@ -1,6 +1,5 @@
 import { createOffersRender, createPhotos, createDataListOptions } from '../utils/render.js';
 
-
 export const createFormTemplate = (data, resetButtonName) => {
   const {type, destination, dateFrom, dateTo, basicPrice, offers, id} = data;
 
@@ -74,7 +73,7 @@ export const createFormTemplate = (data, resetButtonName) => {
     <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
     </label>
-    <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="${id}">
+    <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="${id}" selectonly>
     <datalist class="event__datalist" id="${id}">
       ${createDataListOptions().join('')}
     </datalist>
@@ -93,7 +92,7 @@ export const createFormTemplate = (data, resetButtonName) => {
       <span class="visually-hidden">Price</span>
       &euro;
     </label>
-    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basicPrice}">
+    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basicPrice}">
   </div>
 
   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>

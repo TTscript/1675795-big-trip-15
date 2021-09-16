@@ -1,136 +1,184 @@
-import { RenderPostition, render } from '../utils/render.js';
-import { constants } from '../constants';
+import { RenderPosition, render, remove } from '../utils/render.js';
 import SiteMenuView from '../view/site-menu.js';
-import FilterView from '../view/filters.js';
+import FilterView from '../view/filters-view.js';
 import TripPathView from '../view/trip-path.js';
 import TripPriceView from '../view/trip-price.js';
 import SortView from '../view/sort.js';
-import EmptyListView from '../view/empty-pathes-list.js';
 import { getTotalPrice, getTotalPathes } from '../utils/path-and-price.js';
 import PathPresenter from './path.js';
-import { updateItem } from '../utils/common.js';
 import { sortByDefault, sortByDay, sortByTime, sortByPrice } from '../utils/path-utils.js';
-import { SortType } from '../constants';
+import { SortType, UpdateType, UserAction, constants, FilterType } from '../constants';
+import { filter } from '../utils/filters-utils.js';
+import EmptyListView from '../view/empty-pathes-list.js';
+import PathNewPresenter from './new-path-presenter.js';
 
 export default class Trip {
-  constructor(tripMenu, tripEvents, tripNav, filters) {
+  constructor(tripMenu, tripEvents, tripNav, pathsModel, filterModel) {
+    this._pathsModel = pathsModel;
+    this._filterModel = filterModel;
     this._tripMenu = tripMenu;
     this._tripEvents = tripEvents;
     this._tripNav = tripNav;
-    this._filters = filters;
     this._pathListComponent = constants.pathListComponent;
     this._pathPresenters = new Map();
     this._currentSortType = SortType.DEFAULT;
+    this._filterType = FilterType.EVERYTHING;
+    this._sortComponent = null;
 
     this._siteMenu = new SiteMenuView();
     this._siteFilters = new FilterView();
-    this._emptyList = new EmptyListView();
+    this._noPathComponent = null;
     this._tripPrice = new TripPriceView(getTotalPrice());
     this._tripPath = new TripPathView(getTotalPathes());
-    this._sort = new SortView();
 
-    this._handlePathChange = this._handlePathChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._pathsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
+    this._pathNewPresenter = new PathNewPresenter(this._pathListComponent, this._handleViewAction);
   }
 
-  init(paths) {
-    this._paths = paths.slice();
-    this._sourcePaths = paths.slice();
-
+  init() {
     this._renderSiteMenu();
-    this._renderSiteFilters();
 
     this._renderTrip();
   }
 
-  _sortPaths(sortType) {
-    switch (sortType) {
-      case SortType.DAY:
-        this._paths.sort(sortByDay);
-        break;
-      case SortType.TIME:
-        this._paths.sort(sortByTime);
-        break;
-      case SortType.PRICE:
-        this._paths.sort(sortByPrice);
-        break;
-      default:
-        this._paths = this._sourcePaths.slice();
-    }
+  createTask() {
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._pathNewPresenter.init();
+  }
 
-    this._currentSortType = sortType;
+  _getPaths() {
+    this._filterType = this._filterModel.getFilter();
+    const paths = this._pathsModel.getPaths();
+    const filtredPaths = filter[this._filterType](paths);
+
+    switch (this._currentSortType) {
+      case SortType.DAY:
+        return filtredPaths.sort(sortByDay);
+      case SortType.TIME:
+        return filtredPaths.sort(sortByTime);
+      case SortType.PRICE:
+        return filtredPaths.sort(sortByPrice);
+    }
+    return filtredPaths;
   }
 
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
-    this._sortPaths(sortType);
-    this._clearPathList();
-    this._renderPaths();
+    this._currentSortType = sortType;
+    this._clearTrip();
+    this._renderTrip(this._getPaths().sort(sortByDay));
   }
 
   _renderSort() {
-    render(this._pathListComponent, this._sort, RenderPostition.BEFOREBEGIN);
-    this._sort.setSortTypeChangeHandler(this._handleSortTypeChange);
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
+    }
+
+    this._sortComponent = new SortView(this._currentSortType);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    render(this._pathListComponent, this._sortComponent, RenderPosition.BEFOREBEGIN);
+
     if (this._currentSortType === SortType.DEFAULT) {
-      this._paths.sort(sortByDefault);
+      this._getPaths().sort(sortByDefault);
     }
   }
 
   _handleModeChange() {
+    this._pathNewPresenter.destroy();
     this._pathPresenters.forEach((presenter) => presenter.resetView());
   }
 
-  _handlePathChange(updatedPath) {
-    this._paths = updateItem(this._paths, updatedPath);
-    this._pathPresenters.get(updatedPath.id).init(updatedPath);
+  _handleViewAction(actionType, updateType, update) {
+    switch (actionType) {
+      case UserAction.UPDATE_PATH:
+        this._pathsModel.updatePath(updateType, update);
+        break;
+      case UserAction.ADD_PATH:
+        this._pathsModel.addPath(updateType, update);
+        break;
+      case UserAction.DELETE_PATH:
+        this._pathsModel.deletePath(updateType, update);
+        break;
+    }
+  }
+
+  _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._pathPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this._clearTrip();
+        this._renderTrip();
+        break;
+      case UpdateType.MAJOR:
+        this._clearTrip({resetSortType: true});
+        this._renderTrip();
+        break;
+    }
   }
 
   _renderSiteMenu() {
-    render(this._tripNav, this._siteMenu, RenderPostition.BEFOREEND);
+    render(this._tripNav, this._siteMenu, RenderPosition.BEFOREEND);
   }
 
   _renderTripPrice() {
-    render(this._tripMenu, this._tripPrice, RenderPostition.AFTERBEGIN);
+    render(this._tripMenu, this._tripPrice, RenderPosition.AFTERBEGIN);
   }
 
   _renderTripPaths() {
-    render(this._tripMenu, this._tripPath, RenderPostition.AFTERBEGIN);
+    render(this._tripMenu, this._tripPath, RenderPosition.AFTERBEGIN);
   }
 
   _renderPathList() {
-    render(this._tripEvents, constants.pathListComponent, RenderPostition.AFTERBEGIN);
+    render(this._tripEvents, constants.pathListComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderPath(path) {
-    const pathPresenter = new PathPresenter(this._pathListComponent, this._handlePathChange, this._handleModeChange);
+    const pathPresenter = new PathPresenter(this._pathListComponent, this._handleViewAction, this._handleModeChange);
     pathPresenter.init(path);
     this._pathPresenters.set(path.id, pathPresenter);
   }
 
-  _renderPaths(from, to) {
-    this._paths
-      .slice(from, to)
-      .forEach((path) => this._renderPath(path));
-  }
-
-  _clearPathList() {
-    this._pathPresenters.forEach((presenter) => presenter.destroy());
-    this._pathPresenters.clear();
-  }
-
-  _renderSiteFilters() {
-    render(this._filters, this._siteFilters, RenderPostition.BEFOREEND);
+  _renderPaths(paths) {
+    paths.forEach((path) => this._renderPath(path));
   }
 
   _renderEmptyList() {
-    render(this._tripEvents, this._emptyList, RenderPostition.AFTERBEGIN);
+    this._noPathComponent = new EmptyListView(this._filterType);
+    render(this._tripEvents, this._noPathComponent, RenderPosition.AFTERBEGIN);
+  }
+
+  _clearTrip({resetSortType = false} = {}) {
+    this._pathNewPresenter.destroy();
+    this._pathPresenters.forEach((presenter) => presenter.destroy());
+    this._pathPresenters.clear();
+
+    remove(this._sortComponent);
+    remove(this._pathListComponent);
+
+    if (this._noPathComponent) {
+      remove(this._noPathComponent);
+    }
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DEFAULT;
+    }
   }
 
   _renderTrip() {
-    if (!this._paths.length) {
+    const paths = this._getPaths();
+    if (!paths.length) {
       this._renderEmptyList();
     }
 
@@ -138,7 +186,7 @@ export default class Trip {
     this._renderTripPaths();
     this._renderPathList();
     this._renderSort();
-    this._renderPaths();
+    this._renderPaths(paths);
   }
 }
 

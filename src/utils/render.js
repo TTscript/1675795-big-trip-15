@@ -3,7 +3,7 @@ import { getRandomInteger } from './common.js';
 import { Offer } from '../constants.js';
 import { mocksConstants } from '../mocks/mock-constants.js';
 
-const RenderPostition = {
+const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',
 };
@@ -18,16 +18,16 @@ const render = (container, child, place) => {
   }
 
   switch (place) {
-    case RenderPostition.AFTERBEGIN:
+    case RenderPosition.AFTERBEGIN:
       container.prepend(child);
       break;
-    case RenderPostition.BEFOREEND:
+    case RenderPosition.BEFOREEND:
       container.append(child);
       break;
-    case RenderPostition.BEFOREBEGIN:
+    case RenderPosition.BEFOREBEGIN:
       container.before(child);
       break;
-    case RenderPostition.AFTEREND:
+    case RenderPosition.AFTEREND:
       container.after(child);
       break;
   }
@@ -52,6 +52,10 @@ const replace = (newChild, oldChild) => {
 };
 
 const remove = (component) => {
+  if (component === null) {
+    return;
+  }
+
   if (!(component instanceof Abstract)) {
     throw new Error('Can remove only components');
   }
@@ -130,4 +134,4 @@ const createDataListOptions = () => {
   return dataListOptions;
 };
 
-export { RenderPostition, render, replace, remove, createOffersRender, createPhotos, createDataListOptions };
+export { RenderPosition, render, replace, remove, createOffersRender, createPhotos, createDataListOptions };

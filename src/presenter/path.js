@@ -1,7 +1,8 @@
 import EditFormView from '../view/edit-form.js';
 import PathFormView from '../view/path-form.js';
-import { RenderPostition, render, replace, remove } from '../utils/render.js';
+import { RenderPosition, render, replace, remove } from '../utils/render.js';
 import { isEscPressed } from '../utils/common.js';
+import { UserAction, UpdateType } from '../constants.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -23,6 +24,8 @@ export default class Path {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
+
   }
 
   init(path) {
@@ -37,10 +40,11 @@ export default class Path {
     this._editComponent.setEditSubmitHandler(this._handleFormSubmit);
     this._editComponent.setEditClickHandler(this._handleEditClick);
     this._pathComponent.setPathFavoriteClickHandler(this._handleFavoriteClick);
-    this._editComponent.setChangeTypeClickHandler(this._handleChangeTypeClick);
+    this._editComponent.setDeleteClickHandler(this._handleDeleteClick);
+
 
     if (previousPathComponent === null) {
-      render(this._pathListContainer, this._pathComponent, RenderPostition.BEFOREEND);
+      render(this._pathListContainer, this._pathComponent, RenderPosition.BEFOREEND);
       return;
     }
 
@@ -86,8 +90,18 @@ export default class Path {
     }
   }
 
+  _handleDeleteClick(path) {
+    this._changeData(
+      UserAction.DELETE_PATH,
+      UpdateType.MINOR,
+      path,
+    );
+  }
+
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_PATH,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._path,
@@ -102,7 +116,12 @@ export default class Path {
     this._replacePathToForm();
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(update) {
+    this._changeData(
+      UserAction.UPDATE_PATH,
+      UpdateType.MINOR,
+      update,
+    );
     this._replaceFormToPath();
   }
 

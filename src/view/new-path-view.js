@@ -1,5 +1,5 @@
 import SmartView from './smart.js';
-import { createFormTemplate } from '../form-template.js';
+import { createFormTemplate } from '../view/form-template.js';
 import { generateOffer } from '../mocks/generate-offer.js';
 import { generateDescription, generateRandomPhoto } from '../mocks/generate-destination.js';
 import { mocksConstants } from '../mocks/mock-constants.js';
