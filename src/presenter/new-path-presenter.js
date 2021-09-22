@@ -1,58 +1,75 @@
-import EditFormView from '../view/edit-form.js';
-import {nanoid} from 'nanoid';
+import NewPathView from '../view/new-path-view.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import { UserAction, UpdateType } from '../constants.js';
+// import EditFormView from '../view/edit-form.js';
 
 export default class PathNew {
   constructor(pathListContainer, changeData) {
     this._pathListContainer = pathListContainer;
     this._changeData = changeData;
 
-    this._pathEditComponent = null;
+    this._newComponent = null;
+    this._destroyCallback = null;
 
-    this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleFormSubmit = this._handleNewFormSubmit.bind(this);
+    this._handleCancelClick = this._handleCancelClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init() {
-    if (this._pathEditComponent !== null) {
+  init(callback) {
+    this._destroyCallback = callback;
+
+    if (this._newComponent !== null) {
       return;
     }
 
-    this._pathEditComponent = new EditFormView();
-    this._pathEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pathEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._newComponent = new NewPathView();
+    this._newComponent.setNewSubmitHandler(this._handleFormSubmit);
+    this._newComponent.setCancelClickHandler(this._handleCancelClick);
+    // this._newComponent = new EditFormView();
 
-    render(this._pathListContainer, this._pathEditComponent, RenderPosition.AFTERBEGIN);
+    render(this._pathListContainer, this._newComponent, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this._newComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._newComponent.shake(resetFormState);
+  }
+
   destroy() {
-    if (this._pathEditComponent === null) {
+    if (this._newComponent === null) {
       return;
     }
 
-    remove(this._pathEditComponent);
-    this._pathEditComponent = null;
+    if (this._destroyCallback !== null) {
+      this._destroyCallback();
+    }
+
+    remove(this._newComponent);
+    this._newComponent = null;
 
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
-  _handleFormSubmit(path) {
+  _handleNewFormSubmit(path) {
     this._changeData(
       UserAction.ADD_PATH,
       UpdateType.MINOR,
-      // Пока у нас нет сервера, который бы после сохранения
-      // выдывал честный id задачи, нам нужно позаботиться об этом самим
-      Object.assign({id: nanoid()}, path),
+      path,
     );
-    this.destroy();
   }
 
-  _handleDeleteClick() {
-    this.destroy();
+  _handleCancelClick() {
+
   }
 
   _escKeyDownHandler(evt) {
@@ -60,5 +77,12 @@ export default class PathNew {
       evt.preventDefault();
       this.destroy();
     }
+  }
+
+  setSaving() {
+    this._newComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
   }
 }

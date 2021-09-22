@@ -1,19 +1,30 @@
 import { RenderPosition, render, remove } from '../utils/render.js';
-import SiteMenuView from '../view/site-menu.js';
 import FilterView from '../view/filters-view.js';
-import TripPathView from '../view/trip-path.js';
-import TripPriceView from '../view/trip-price.js';
+import TripPathsAndPricesView from '../view/trip-and-path-view.js';
 import SortView from '../view/sort.js';
 import { getTotalPrice, getTotalPathes } from '../utils/path-and-price.js';
-import PathPresenter from './path.js';
+import PathPresenter, {State as PathPresenterViewState} from './path.js';
 import { sortByDefault, sortByDay, sortByTime, sortByPrice } from '../utils/path-utils.js';
 import { SortType, UpdateType, UserAction, constants, FilterType } from '../constants';
 import { filter } from '../utils/filters-utils.js';
 import EmptyListView from '../view/empty-pathes-list.js';
 import PathNewPresenter from './new-path-presenter.js';
+import LoadingView from '../view/loading.js';
+
+const createPropertiesNewEventButton = (key) => {
+  const keyWord = key;
+  const button = document.querySelector('.trip-main__event-add-btn');
+  if (keyWord === 'disabled') {
+    button.setAttribute('disabled', '');
+  }
+
+  if (keyWord === 'enabled') {
+    button.removeAttribute('disabled');
+  }
+};
 
 export default class Trip {
-  constructor(tripMenu, tripEvents, tripNav, pathsModel, filterModel) {
+  constructor(tripMenu, tripEvents, tripNav, pathsModel, filterModel, api) {
     this._pathsModel = pathsModel;
     this._filterModel = filterModel;
     this._tripMenu = tripMenu;
@@ -24,12 +35,13 @@ export default class Trip {
     this._currentSortType = SortType.DEFAULT;
     this._filterType = FilterType.EVERYTHING;
     this._sortComponent = null;
+    this._isLoading = true;
+    this._api = api;
 
-    this._siteMenu = new SiteMenuView();
     this._siteFilters = new FilterView();
     this._noPathComponent = null;
-    this._tripPrice = new TripPriceView(getTotalPrice());
-    this._tripPath = new TripPathView(getTotalPathes());
+    this._tripPathsAndPrices = new TripPathsAndPricesView(getTotalPathes(), getTotalPrice());
+    this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -43,15 +55,22 @@ export default class Trip {
   }
 
   init() {
-    this._renderSiteMenu();
-
+    this._pathsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
     this._renderTrip();
   }
 
-  createTask() {
-    this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._pathNewPresenter.init();
+  destroy() {
+    this._clearTrip({resetSortType: true});
+
+    remove(this._pathListComponent);
+
+    this._pathsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  createPath(callback) {
+    this._pathNewPresenter.init(callback);
   }
 
   _getPaths() {
@@ -101,13 +120,34 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_PATH:
-        this._pathsModel.updatePath(updateType, update);
+        this._pathPresenters.get(update.id).setViewState(PathPresenterViewState.SAVING);
+        this._api.updatePath(update)
+          .then((response) => {
+            this._pathsModel.updatePath(updateType, response);
+          })
+          .catch(() => {
+            this._pathPresenters.get(update.id).setViewState(PathPresenterViewState.ABORTING);
+          });
         break;
       case UserAction.ADD_PATH:
-        this._pathsModel.addPath(updateType, update);
+        this._pathNewPresenter.setSaving();
+        this._api.addPath(update)
+          .then((response) => {
+            this._pathsModel.addPath(updateType, response);
+          })
+          .catch(() => {
+            this._pathNewPresenter.setAborting();
+          });
         break;
       case UserAction.DELETE_PATH:
-        this._pathsModel.deletePath(updateType, update);
+        this._pathPresenters.get(update.id).setViewState(PathPresenterViewState.DELETING);
+        this._api.deletePath(update)
+          .then(() => {
+            this._pathsModel.deletePath(updateType, update);
+          })
+          .catch(() => {
+            this._pathPresenter.get(update.id).setViewState(PathPresenterViewState.ABORTING);
+          });
         break;
     }
   }
@@ -125,19 +165,17 @@ export default class Trip {
         this._clearTrip({resetSortType: true});
         this._renderTrip();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        createPropertiesNewEventButton('enabled');
+        this._renderTrip();
+        break;
     }
   }
 
-  _renderSiteMenu() {
-    render(this._tripNav, this._siteMenu, RenderPosition.BEFOREEND);
-  }
-
-  _renderTripPrice() {
-    render(this._tripMenu, this._tripPrice, RenderPosition.AFTERBEGIN);
-  }
-
-  _renderTripPaths() {
-    render(this._tripMenu, this._tripPath, RenderPosition.AFTERBEGIN);
+  _renderTripPathsAndPrice() {
+    render(this._tripMenu, this._tripPathsAndPrices, RenderPosition.AFTERBEGIN);
   }
 
   _renderPathList() {
@@ -159,6 +197,10 @@ export default class Trip {
     render(this._tripEvents, this._noPathComponent, RenderPosition.AFTERBEGIN);
   }
 
+  _renderLoading() {
+    render(this._tripEvents, this._loadingComponent, RenderPosition.AFTERBEGIN);
+  }
+
   _clearTrip({resetSortType = false} = {}) {
     this._pathNewPresenter.destroy();
     this._pathPresenters.forEach((presenter) => presenter.destroy());
@@ -166,6 +208,7 @@ export default class Trip {
 
     remove(this._sortComponent);
     remove(this._pathListComponent);
+    remove(this._loadingComponent);
 
     if (this._noPathComponent) {
       remove(this._noPathComponent);
@@ -177,13 +220,18 @@ export default class Trip {
   }
 
   _renderTrip() {
+    if (this._isLoading) {
+      createPropertiesNewEventButton('disabled');
+      this._renderLoading();
+      return;
+    }
     const paths = this._getPaths();
     if (!paths.length) {
       this._renderEmptyList();
     }
 
-    this._renderTripPrice();
-    this._renderTripPaths();
+    // this._renderTripPrice();
+    this._renderTripPathsAndPrice();
     this._renderPathList();
     this._renderSort();
     this._renderPaths(paths);

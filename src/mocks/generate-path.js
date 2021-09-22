@@ -4,7 +4,6 @@ import { generateDestination } from './generate-destination.js';
 import { generateBasicPrice } from './generate-basic-price.js';
 import { generateDate, getTimeDifference } from './generate-date.js';
 import { generateFavorites } from './generate-favorites.js';
-import { nanoid } from 'nanoid';
 
 export const generatePath = () => {
   const basicPrice = generateBasicPrice();
@@ -16,7 +15,6 @@ export const generatePath = () => {
   }
 
   const destination = generateDestination();
-  const id = nanoid();
   const isFavorite = generateFavorites();
   const offers = generateOffer();
   const type = generateTypes();
@@ -28,7 +26,6 @@ export const generatePath = () => {
     dateTo,
     totalPathTime,
     destination,
-    id,
     isFavorite,
     type,
     offers,

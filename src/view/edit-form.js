@@ -12,8 +12,6 @@ export default class EditForm extends SmartView {
     super();
     this._data = EditForm.parsePathToData(path);
     this._datepicker = null;
-    this._dateFrom = path.dateFrom.format('DD/MM/YYYY HH:mm');
-    this._dateTo = path.dateTo.format('DD/MM/YYYY HH:mm');
 
     this._resetButtonName = 'Delete';
     this._clickHandler = this._clickHandler.bind(this);
@@ -28,7 +26,7 @@ export default class EditForm extends SmartView {
   }
 
   getTemplate() {
-    return createFormTemplate(this._data, this._resetButtonName);
+    return createFormTemplate(this._data, this._resetButtonName, 'edit');
   }
 
   removeElement() {
@@ -51,7 +49,6 @@ export default class EditForm extends SmartView {
       {
         enableTime: true,
         dateFormat: 'd/m/Y H:i',
-        defaultDate: this._dateFrom,
         onClose: this._dueDateChangeHandler,
         'plugins': [new rangePlugin({ input: this.getElement().querySelector('#event-end-time-1')})],
       },
@@ -59,6 +56,8 @@ export default class EditForm extends SmartView {
   }
 
   _dueDateChangeHandler() {
+    console.log(this.getElement().querySelector('#event-start-time-1').value);
+    console.log(this.getElement().querySelector('#event-end-time-1').value);
     this.updateData({
       dateFrom: this.getElement().querySelector('#event-start-time-1').value,
       dateTo: this.getElement().querySelector('#event-end-time-1').value,
@@ -93,12 +92,18 @@ export default class EditForm extends SmartView {
       {},
       path,
       {
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
       },
     );
   }
 
   static parseDataToPath(data) {
     data = Object.assign({}, data);
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
     return data;
   }
 
@@ -117,7 +122,7 @@ export default class EditForm extends SmartView {
 
   setDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+    this.getElement().querySelector(`.event__${this._resetButtonName.toLowerCase()}-btn`).addEventListener('click', this._formDeleteClickHandler);
   }
 
   _changeDestinationClickHandler(evt) {

@@ -1,7 +1,6 @@
 import Abstract from '../view/abstract.js';
-import { getRandomInteger } from './common.js';
-import { Offer } from '../constants.js';
 import { mocksConstants } from '../mocks/mock-constants.js';
+import dayjs from 'dayjs';
 
 const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
@@ -67,52 +66,17 @@ const remove = (component) => {
 const createOffersRender = (offers) => {
   const offersBlock = [];
 
-  for (let i = 0; i < offers.offer.length; i++) {
-    let bend = '';
-    switch (offers.offer[i].title) {
-      case Offer.BUSINESS:
-        bend = 'business-class';
-        break;
-      case Offer.RADIO:
-        bend = 'radio-station';
-        break;
-      case Offer.UBER:
-        bend = 'order-uber';
-        break;
-      case Offer.LUGGAGE:
-        bend = 'luggage';
-        break;
-      case Offer.CAR:
-        bend = 'rent-car';
-        break;
-      case Offer.BREAKFAST:
-        bend = 'breakfast';
-        break;
-      case Offer.COMFORT:
-        bend = 'comfort';
-        break;
-      case Offer.SEAT:
-        bend = 'seats';
-        break;
-      case Offer.TRAIN:
-        bend = 'train';
-        break;
-      case Offer.MEAL:
-        bend = 'meal';
-        break;
-    }
-
-    const isChecked = () => Boolean(getRandomInteger(0, 1)) === true ? 'checked' : '';
-
+  for (let i = 0; i < offers.length; i++) {
     offersBlock.push(`<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${bend}-1" type="checkbox" name="event-offer-${bend}" ${isChecked()}>
-    <label class="event__offer-label" for="event-offer-${bend}-1">
-      <span class="event__offer-title">${offers.offer[i].title}</span>
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offers[i].title}-1" type="checkbox" name="event-offer-${offers[i].title}">
+    <label class="event__offer-label" for="event-offer-${offers[i].title}-1">
+      <span class="event__offer-title">${offers[i].title}</span>
       &plus;&euro;&nbsp;
-      <span class="event__offer-price">${offers.offer[i].price}</span>
+      <span class="event__offer-price">${offers[i].price}</span>
     </label>
   </div>`);
   }
+
   return offersBlock.join('');
 };
 
@@ -134,4 +98,19 @@ const createDataListOptions = () => {
   return dataListOptions;
 };
 
-export { RenderPosition, render, replace, remove, createOffersRender, createPhotos, createDataListOptions };
+const getTimeDifference = (dateFrom, dateTo) => {
+  const getHourDifference = () => dayjs(dateFrom).format('HH') - dayjs(dateTo).format('HH');
+  const getMinuteDifference = () => dayjs(dateFrom).format('mm') - dayjs(dateTo).format('mm');
+  const getDayDifference = () => dayjs(dateFrom).format('DD') - dayjs(dateTo).format('DD');
+
+
+  if (Math.abs(getHourDifference()) < 1) {
+    return `${Math.abs(getMinuteDifference())}M`;
+  } else if (`${Math.abs(getDayDifference()) < 1}`) {
+    return `${Math.abs(getHourDifference())}H${Math.abs(getMinuteDifference())}M`;
+  } else if (`${Math.abs(getDayDifference()) > 1}`) {
+    return `${Math.abs(getDayDifference())}D${Math.abs(getHourDifference())}H${Math.abs(getMinuteDifference())}M`;
+  }
+};
+
+export { RenderPosition, render, replace, remove, createOffersRender, createPhotos, createDataListOptions, getTimeDifference };

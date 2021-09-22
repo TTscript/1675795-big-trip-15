@@ -41,6 +41,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 const FilterType = {
@@ -49,4 +50,22 @@ const FilterType = {
   PAST: 'past',
 };
 
-export { constants, SortType, Offer, UserAction, UpdateType, FilterType };
+const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
+
+const MenuItem = {
+  ADD_NEW_PATH: 'ADD_NEW_PATH',
+  PATHS: 'Table',
+  STATISTICS: 'Stats',
+};
+
+const Color = {
+  BASIC_WHITE: '#ffffff',
+  BASIC_BLACK: '#000000',
+  PRIMARY_COLOR: '#078ff0',
+};
+
+export { constants, SortType, Offer, UserAction, UpdateType, FilterType, State, MenuItem, Color };

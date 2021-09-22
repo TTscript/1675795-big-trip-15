@@ -9,6 +9,12 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
+
 export default class Path {
   constructor(pathListContainer, changeData, changeMode) {
     this._pathListContainer = pathListContainer;
@@ -16,7 +22,7 @@ export default class Path {
     this._changeMode = changeMode;
 
     this._pathComponent = null;
-    this._pathEditComponent = null;
+    this._editComponent = null;
     this._mode = Mode.DEFAULT;
 
     this._handlePathClick = this._handlePathClick.bind(this);
@@ -25,7 +31,6 @@ export default class Path {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
-
   }
 
   init(path) {
@@ -53,10 +58,44 @@ export default class Path {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._pathEditComponent, previousPathComponent);
+      replace(this._pathComponent, previousPathComponent);
+      this._mode === Mode.DEFAULT;
     }
 
     remove(previousPathComponent);
+  }
+
+  setViewState(state) {
+    if (this._mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this._editComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._pathComponent.shake(resetFormState);
+        this._editComponent.shake(resetFormState);
+        break;
+    }
   }
 
   destroy() {
@@ -122,7 +161,6 @@ export default class Path {
       UpdateType.MINOR,
       update,
     );
-    this._replaceFormToPath();
   }
 
   _handleEditClick() {

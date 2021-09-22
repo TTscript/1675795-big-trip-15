@@ -1,39 +1,52 @@
 import AbstractView from './abstract.js';
+import dayjs from 'dayjs';
+import { getTimeDifference } from '../utils/render.js';
 
 const createPathFormTemplate = (paths) => {
-  const {type, destination, dateFrom, dateTo, totalPathTime, basicPrice, isFavorite} = paths;
+  const {type, dateFrom, dateTo, basicPrice, isFavorite, offers} = paths;
   const determineFavorites = () => {
     if (isFavorite === true) {
       return 'event__favorite-btn--active';
     }
   };
+// console.log(offers[0].title);
+  const createOffersRender = (pathOffers) => {
+    const offersBlock = [];
+
+    for (let i = 0; i < pathOffers.length; i++) {
+      offersBlock.push(`<li class="event__offer">
+      <span class="event__offer-title">${pathOffers[i].title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${pathOffers[i].price}</span>
+    </li>`);
+    }
+
+    return offersBlock.join('');
+  };
+
 
   const createRoutePoint = () =>
     `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${dateFrom.format('YYYY-MM-DD')}">${dateFrom.format('MMM DD')}</time>
+      <time class="event__date" datetime="${dateFrom}">${dayjs(dateFrom).format('MMM DD')}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${destination.name}</h3>
+      <h3 class="event__title">${type}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-18T10:30">${dateFrom.format('HH:mm')}</time>
+          <time class="event__start-time" datetime="2019-03-18T10:30">${dayjs(dateFrom).format('HH:mm')}</time>
           &mdash;
-          <time class="event__end-time" datetime="2019-03-18T11:00">${dateTo.format('HH:mm')}</time>
+          <time class="event__end-time" datetime="2019-03-18T11:00">${dayjs(dateTo).format('HH:mm')}</time>
         </p>
-        <p class="event__duration">${totalPathTime}</p>
+        <p class="event__duration">${getTimeDifference(dateFrom, dateTo)}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${basicPrice}</span>
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        <li class="event__offer">
-          <span class="event__offer-title">${type}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${basicPrice}</span>
-        </li>
+      ${createOffersRender(offers)}
       </ul>
       <button class="event__favorite-btn ${determineFavorites()}" type="button">
         <span class="visually-hidden">Add to favorite</span>
