@@ -14,9 +14,7 @@ const tripEvents = document.querySelector('.trip-events');
 const tripNav = tripMenu.querySelector('.trip-controls__navigation');
 const filtersRendering = document.querySelector('.trip-controls__filters');
 
-const AUTHORIZATION = 'Basic w23Q23ffkd3552jfj';
-const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
-const api = new Api(END_POINT, AUTHORIZATION);
+const api = new Api();
 const pathsModel = new PathsModel();
 const filterModel = new FilterModel();
 const tripPresenter = new TripPresenter(tripMenu, tripEvents, tripNav, pathsModel, filterModel, api);
@@ -52,3 +50,4 @@ api.getPaths()
   .catch(() => {
     pathsModel.setPaths(UpdateType.INIT, []);
   });
+

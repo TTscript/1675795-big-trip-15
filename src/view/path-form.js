@@ -9,7 +9,7 @@ const createPathFormTemplate = (paths) => {
       return 'event__favorite-btn--active';
     }
   };
-// console.log(offers[0].title);
+
   const createOffersRender = (pathOffers) => {
     const offersBlock = [];
 

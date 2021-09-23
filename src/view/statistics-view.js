@@ -1,8 +1,8 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import SmartView from './smart.js';
-import {calculateMoney, calculateType, calculateTime} from '../utils/statistics-util.js';
-import {getFormattedEventDuration} from '../utils/date.js';
+import { calculateMoney, calculateType, calculateTime } from '../utils/statistics-util.js';
+import { getFormattedEventDuration } from '../utils/date.js';
 import {Color} from '../constants.js';
 
 const BAR_HEIGHT = 55;
@@ -210,7 +210,7 @@ const renderTimeSpendChart = (ctx, events)=> {
             display: false,
             drawBorder: false,
           },
-          minBarLength: 50,
+          minBarLength: 90,
         }],
       },
       legend: {

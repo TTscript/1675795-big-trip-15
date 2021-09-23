@@ -3,8 +3,6 @@ import { createOffersRender, createPhotos, createDataListOptions } from '../util
 export const createFormTemplate = (data, resetButtonName, form) => {
   const { type, destination, dateFrom, dateTo, basicPrice, offers, id, isDisabled, isSaving, isDeleting} = data;
 
-  // console.log(dateFrom);
-
   const determineDestinationName = () => {
     if (form === 'new') {
       return '';

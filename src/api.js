@@ -13,7 +13,7 @@ const SuccessHTTPStatusRange = {
 };
 
 export default class Api {
-  constructor(endPoint, authorization) {
+  constructor(endPoint = 'https://15.ecmascript.pages.academy/big-trip', authorization = 'Basic w23Q23ffkd3552jfj') {
     this._endPoint = endPoint;
     this._authorization = authorization;
   }

@@ -1,11 +1,9 @@
 import SmartView from './smart.js';
 import { createFormTemplate } from './form-template.js';
-import { generateOffer } from '../mocks/generate-offer.js';
-import { generateDescription, generateRandomPhoto } from '../mocks/generate-destination.js';
-import { mocksConstants } from '../mocks/mock-constants.js';
 import flatpickr from 'flatpickr';
 import rangePlugin from '../../node_modules/flatpickr/dist/plugins/rangePlugin';
 import 'flatpickr/dist/flatpickr.min.css';
+// import { createOffersRender } from '../utils/render.js';
 
 export default class EditForm extends SmartView {
   constructor(path) {
@@ -20,9 +18,9 @@ export default class EditForm extends SmartView {
     this._changeDestinationClickHandler = this._changeDestinationClickHandler.bind(this);
     this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
+    this._changePriceHandler = this._changePriceHandler.bind(this);
 
     this._setInnerHandlers();
-    this._setDatepicker();
   }
 
   getTemplate() {
@@ -56,8 +54,6 @@ export default class EditForm extends SmartView {
   }
 
   _dueDateChangeHandler() {
-    console.log(this.getElement().querySelector('#event-start-time-1').value);
-    console.log(this.getElement().querySelector('#event-end-time-1').value);
     this.updateData({
       dateFrom: this.getElement().querySelector('#event-start-time-1').value,
       dateTo: this.getElement().querySelector('#event-end-time-1').value,
@@ -85,6 +81,11 @@ export default class EditForm extends SmartView {
     this.getElement()
       .querySelector('.event__type-list')
       .addEventListener('change', this._changeTypeClickHandler);
+    this.getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('input', this._changePriceHandler);
+    this._setDatepicker();
+
   }
 
   static parsePathToData(path) {
@@ -107,11 +108,18 @@ export default class EditForm extends SmartView {
     return data;
   }
 
+  _changePriceHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      basicPrice: evt.target.value,
+    }, true);
+  }
+
   _changeTypeClickHandler(evt) {
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
-      offers: generateOffer(),
+      // offers: createOffersRender,
     });
   }
 
@@ -132,8 +140,8 @@ export default class EditForm extends SmartView {
         {},
         this._data.destination,
         {name: evt.target.value},
-        {pictures: generateRandomPhoto()},
-        {description: generateDescription(mocksConstants.MAX_QUANTITY_GENERAL_DESCRIPTION)},
+        // {pictures: generateRandomPhoto()},
+        // {description: generateDescription(mocksConstants.MAX_QUANTITY_GENERAL_DESCRIPTION)},
       ),
     });
   }

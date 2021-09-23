@@ -1,5 +1,4 @@
 import AbstractObserver from '../utils/abstract-observer';
-import dayjs from 'dayjs';
 
 export default class Paths extends AbstractObserver {
   constructor() {
@@ -58,7 +57,6 @@ export default class Paths extends AbstractObserver {
   }
 
   static adaptToClient(path) {
-    // console.log(path['date_from']);
     const adaptedPath = Object.assign(
       {},
       path,
@@ -83,14 +81,13 @@ export default class Paths extends AbstractObserver {
       {},
       path,
       {
-        'base_price': path.basicPrice,
+        'base_price': Math.abs(path.basicPrice),
         'date_from': new Date(path.dateFrom),
         'date_to': new Date(path.dateTo),
         'is_favorite': path.isFavorite,
       },
     );
 
-    // Ненужные ключи мы удаляем
     delete adaptedPath.basicPrice;
     delete adaptedPath.dateFrom;
     delete adaptedPath.dateTo;

@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
-import {FilterType} from '../constants.js';
+import { FilterType } from '../constants.js';
+import duration from 'dayjs/plugin/duration.js';
+dayjs.extend(duration);
 
 export const formatDate = (dueDate, format) => dayjs(dueDate).format(format);
 

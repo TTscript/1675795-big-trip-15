@@ -99,7 +99,7 @@ const createDataListOptions = () => {
 };
 
 const getTimeDifference = (dateFrom, dateTo) => {
-  const getHourDifference = () => dayjs(dateFrom).format('HH') - dayjs(dateTo).format('HH');
+  const getHourDifference = () => dayjs().format('HH') - dayjs(dateTo).format('HH');
   const getMinuteDifference = () => dayjs(dateFrom).format('mm') - dayjs(dateTo).format('mm');
   const getDayDifference = () => dayjs(dateFrom).format('DD') - dayjs(dateTo).format('DD');
 

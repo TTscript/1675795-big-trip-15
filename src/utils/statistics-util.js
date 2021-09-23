@@ -2,8 +2,8 @@ import { getDateDuration } from './date';
 
 export const calculateMoney = (events) => {
   const money = {};
-  events.forEach(({type, basePrice}) => {
-    money[type] = money[type] !== undefined ? money[type] + basePrice : basePrice;
+  events.forEach(({type, basicPrice}) => {
+    money[type] = money[type] !== undefined ? money[type] + basicPrice : basicPrice;
   });
   return new Map(Object.entries(money).sort((a, b) => b[1] - a[1]));
 };

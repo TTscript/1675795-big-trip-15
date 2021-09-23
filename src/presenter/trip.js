@@ -36,11 +36,12 @@ export default class Trip {
     this._filterType = FilterType.EVERYTHING;
     this._sortComponent = null;
     this._isLoading = true;
+
     this._api = api;
 
     this._siteFilters = new FilterView();
     this._noPathComponent = null;
-    this._tripPathsAndPrices = new TripPathsAndPricesView(getTotalPathes(), getTotalPrice());
+    // this._tripPathsAndPrices = new TripPathsAndPricesView();
     this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -79,6 +80,8 @@ export default class Trip {
     const filtredPaths = filter[this._filterType](paths);
 
     switch (this._currentSortType) {
+      case SortType.DEFAULT:
+        return filtredPaths.sort(sortByDefault);
       case SortType.DAY:
         return filtredPaths.sort(sortByDay);
       case SortType.TIME:
@@ -95,7 +98,7 @@ export default class Trip {
     }
     this._currentSortType = sortType;
     this._clearTrip();
-    this._renderTrip(this._getPaths().sort(sortByDay));
+    this._renderTrip(this._getPaths());
   }
 
   _renderSort() {
@@ -174,7 +177,8 @@ export default class Trip {
     }
   }
 
-  _renderTripPathsAndPrice() {
+  _renderTripPathsAndPrice(path) {
+    this._tripPathsAndPrices = new TripPathsAndPricesView(path, getTotalPathes(path), getTotalPrice(path));
     render(this._tripMenu, this._tripPathsAndPrices, RenderPosition.AFTERBEGIN);
   }
 
@@ -209,6 +213,7 @@ export default class Trip {
     remove(this._sortComponent);
     remove(this._pathListComponent);
     remove(this._loadingComponent);
+    remove(this._tripPathsAndPrices);
 
     if (this._noPathComponent) {
       remove(this._noPathComponent);
@@ -230,8 +235,7 @@ export default class Trip {
       this._renderEmptyList();
     }
 
-    // this._renderTripPrice();
-    this._renderTripPathsAndPrice();
+    this._renderTripPathsAndPrice(paths);
     this._renderPathList();
     this._renderSort();
     this._renderPaths(paths);
