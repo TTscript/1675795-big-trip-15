@@ -11,4 +11,4 @@ export default class Loading extends AbstractView {
     return createNoPathTemplate();
   }
 }
-//test
+//testing file

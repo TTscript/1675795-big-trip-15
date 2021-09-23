@@ -52,9 +52,3 @@ api.getPaths()
   .catch(() => {
     pathsModel.setPaths(UpdateType.INIT, []);
   });
-
-
-  // api.getOffers()
-  //   .then((offers) => {
-  //     console.log(offers[0].offers);
-  //   });
